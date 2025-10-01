@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лото в TON</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .balance {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .chest-section {
+            margin-bottom: 30px;
+        }
+        
+        .chest-type {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .chest-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .chest-item {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chest-item:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: #ffd700;
+        }
+        
+        .chest-item.available {
+            background: rgba(76, 175, 80, 0.3);
+        }
+        
+        .chest-item.sold {
+            background: rgba(244, 67, 54, 0.3);
+            cursor: not-allowed;
+        }
+        
+        .chest-number {
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .price {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .user-info {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎰 Лото в TON</h1>
+            <p>Выберите свой счастливый сундук!</p>
+        </div>
+
+        <div id="userInfo" class="user-info" style="display: none;">
+            <!-- Информация о пользователе -->
+        </div>
+        
+        <div class="balance">
+            <h2>💎 Баланс: <span id="balance">100</span> монет</h2>
+        </div>
+        
+        <!-- Блок обычных сундуков -->
+        <div class="chest-section">
+            <div class="chest-type">
+                <h3>🎒 Обычные сундуки (1 монета)</h3>
+                <p>Осталось: <span id="chest1-remaining">1000</span>/1000</p>
+                <div class="chest-grid" id="chest1-grid">
+                    <!-- Сундуки будут генерироваться через JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Блок редких сундуков -->
+        <div class="chest-section">
+            <div class="chest-type">
+                <h3>🎒 Редкие сундуки (5 монет)</h3>
+                <p>Осталось: <span id="chest5-remaining">500</span>/500</p>
+                <div class="chest-grid" id="chest5-grid">
+                    <!-- Сундуки будут генерироваться через JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Блок эпических сундуков -->
+        <div class="chest-section">
+            <div class="chest-type">
+                <h3>🎒 Эпические сундуки (10 монет)</h3>
+                <p>Осталось: <span id="chest10-remaining">200</span>/200</p>
+                <div class="chest-grid" id="chest10-grid">
+                    <!-- Сундуки будут генерироваться через JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            Загрузка данных...
+        </div>
+        
+        <button class="btn" onclick="location.reload()">🔄 Обновить</button>
+        <button class="btn" onclick="showMessage('По вопросам пишите @your_bot_username')">📞 Поддержка</button>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        let tg = window.Telegram.WebApp;
+        
+        // Расширяем на весь экран
+        tg.expand();
+        
+        // Показываем информацию о пользователе
+        function showUserInfo() {
+            const user = tg.initDataUnsafe.user;
+            if (user) {
+                const userInfo = document.getElementById('userInfo');
+                userInfo.innerHTML = `👤 ${user.first_name}${user.last_name ? ' ' + user.last_name : ''}${user.username ? ` (@${user.username})` : ''}`;
+                userInfo.style.display = 'block';
+            }
+        }
+
+        // Инициализация игры
+        function initGame() {
+            showUserInfo();
+            document.getElementById('loading').style.display = 'none';
+            
+            // Создаем сетки сундуков (пока демо-данные)
+            createChestGrid(1, 1000, 'chest1-grid');
+            createChestGrid(5, 500, 'chest5-grid');
+            createChestGrid(10, 200, 'chest10-grid');
+        }
+        
+        // Создание сетки сундуков
+        function createChestGrid(price, total, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            // Демо-данные: случайным образом помечаем некоторые сундуки как проданные
+            const soldNumbers = [];
+            const soldCount = Math.floor(Math.random() * 10); // 0-9 проданных
+            
+            for (let i = 0; i < soldCount; i++) {
+                soldNumbers.push(Math.floor(Math.random() * 25) + 1);
+            }
+            
+            // Создаем 25 сундуков для демонстрации
+            for (let i = 1; i <= 25; i++) {
+                const chest = document.createElement('div');
+                const isSold = soldNumbers.includes(i);
+                
+                chest.className = `chest-item ${isSold ? 'sold' : 'available'}`;
+                chest.innerHTML = `
+                    <div class="chest-number">${i}</div>
+                    <div class="price">${price} монет</div>
+                `;
+                
+                if (!isSold) {
+                    chest.onclick = () => buyChest(price, i);
+                } else {
+                    chest.title = 'Уже куплен';
+                }
+                
+                container.appendChild(chest);
+            }
+            
+            // Обновляем счетчик оставшихся
+            const remaining = total - soldCount;
+            document.getElementById(`chest${price}-remaining`).textContent = remaining;
+        }
+        
+        // Покупка сундука
+        function buyChest(price, number) {
+            const user = tg.initDataUnsafe.user;
+            if (!user) {
+                showMessage('Ошибка: пользователь не определен');
+                return;
+            }
+
+            // Показываем демо-сообщение
+            showMessage(`🎉 Демо: Вы выбрали сундук №${number} за ${price} монет!\n\nВ реальной версии здесь будет подключение к боту.`);
+            
+            // В реальной версии здесь будет запрос к боту:
+            /*
+            fetch('/buy_chest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: user.id,
+                    chest_price: price,
+                    chest_number: number
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage(`🎉 Вы купили сундук №${number}!`);
+                    initGame(); // Обновляем интерфейс
+                } else {
+                    showMessage('Ошибка: ' + data.error);
+                }
+            });
+            */
+        }
+        
+        function showMessage(text) {
+            alert(text);
+        }
+
+        // Закрытие Web App
+        tg.BackButton.onClick(() => {
+            tg.close();
+        });
+        
+        // Запускаем игру при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            // Даем время на анимацию загрузки
+            setTimeout(initGame, 1000);
+        });
+    </script>
+</body>
+</html>
