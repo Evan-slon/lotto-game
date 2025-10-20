@@ -679,7 +679,29 @@
             // Переходим на страницу билетов с выбранным пулом
             window.location.href = 'tickets.html';
         }
-
+// Функция для отправки данных о покупке в Telegram
+function sendPurchaseToTelegram(poolId, tickets, cost) {
+    const userData = JSON.parse(localStorage.getItem('telegramUser') || '{}');
+    const purchaseData = {
+        action: 'purchase',
+        user: userData,
+        pool: poolId,
+        tickets: tickets,
+        cost: cost,
+        timestamp: new Date().toISOString()
+    };
+    
+    sendDataToBot(purchaseData);
+    
+    // Показываем уведомление в Telegram
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.showPopup({
+            title: '🎉 Покупка завершена!',
+            message: `Вы купили ${tickets.length} билетов за ${cost} TON`,
+            buttons: [{ type: 'ok' }]
+        });
+    }
+}
         // Запуск игры
         document.addEventListener('DOMContentLoaded', initGame);
     </script>
