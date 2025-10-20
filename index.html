@@ -256,6 +256,62 @@
     </style>
 </head>
 <body>
+    <!-- Telegram Web App Integration -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
+        
+        // Функция для отправки данных в бот
+        function sendDataToBot(data) {
+            if (tg && tg.sendData) {
+                tg.sendData(JSON.stringify(data));
+            }
+        }
+        
+        // Функция для закрытия Web App
+        function closeWebApp() {
+            if (tg && tg.close) {
+                tg.close();
+            }
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Раскрываем Web App на весь экран
+            tg.expand();
+            
+            // Включаем кнопку "Назад"
+            tg.BackButton.show();
+            tg.BackButton.onClick(function() {
+                closeWebApp();
+            });
+            
+            // Получаем данные пользователя Telegram
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                console.log('Telegram User:', user);
+                // Сохраняем данные пользователя в localStorage
+                const userData = {
+                    id: user.id,
+                    first_name: user.first_name,
+                    username: user.username,
+                    language_code: user.language_code
+                };
+                localStorage.setItem('telegramUser', JSON.stringify(userData));
+            }
+            
+            // Говорим Telegram, что приложение готово
+            tg.ready();
+            
+            // Показываем уведомление о успешной загрузке
+            tg.showPopup({
+                title: 'Добро пожаловать!',
+                message: 'TON Lottery успешно загружена',
+                buttons: [{ type: 'ok' }]
+            });
+        });
+    </script>
     <div class="container">
         <!-- Шапка -->
         <div class="header">
