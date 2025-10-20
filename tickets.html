@@ -524,6 +524,55 @@
     </style>
 </head>
 <body>
+    <!-- Telegram Web App Integration -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
+        
+        // Функция для отправки данных в бот
+        function sendDataToBot(data) {
+            if (tg && tg.sendData) {
+                tg.sendData(JSON.stringify(data));
+            }
+        }
+        
+        // Функция для закрытия Web App
+        function closeWebApp() {
+            if (tg && tg.close) {
+                tg.close();
+            }
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Раскрываем Web App на весь экран
+            tg.expand();
+            
+            // Включаем кнопку "Назад"
+            tg.BackButton.show();
+            tg.BackButton.onClick(function() {
+                closeWebApp();
+            });
+            
+            // Получаем данные пользователя Telegram
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                console.log('Telegram User:', user);
+                // Сохраняем данные пользователя в localStorage
+                const userData = {
+                    id: user.id,
+                    first_name: user.first_name,
+                    username: user.username,
+                    language_code: user.language_code
+                };
+                localStorage.setItem('telegramUser', JSON.stringify(userData));
+            }
+            
+            // Говорим Telegram, что приложение готово
+            tg.ready();
+        });
+    </script>
     <div class="container">
         <!-- Шапка -->
         <div class="header">
@@ -918,71 +967,106 @@
             document.getElementById('purchaseModal').classList.remove('active');
         }
 
-        // Подтверждение покупки
-        function confirmPurchase() {
-            const pool = getCurrentPool();
-            const cost = ticketData.selectedTickets.length * pool.price;
+// Подтверждение покупки
+function confirmPurchase() {
+    const pool = getCurrentPool();
+    const cost = ticketData.selectedTickets.length * pool.price;
 
-            // Сохраняем покупку в localStorage
-            const saved = localStorage.getItem('tonLotteryGameData');
-            let data = saved ? JSON.parse(saved) : { pools: {}, userProfile: {} };
-            
-            // Инициализируем пул если его нет
-            if (!data.pools[ticketData.currentPool]) {
-                data.pools[ticketData.currentPool] = {
-                    name: pool.name,
-                    price: pool.price,
-                    totalTickets: pool.totalTickets,
-                    soldTickets: 0,
-                    prizeFund: pool.prizeFund,
-                    soldTicketsList: [] // Список проданных билетов
-                };
-            }
+    // Сохраняем покупку в localStorage
+    const saved = localStorage.getItem('tonLotteryGameData');
+    let data = saved ? JSON.parse(saved) : { pools: {}, userProfile: {} };
+    
+    // Инициализируем пул если его нет
+    if (!data.pools[ticketData.currentPool]) {
+        data.pools[ticketData.currentPool] = {
+            name: pool.name,
+            price: pool.price,
+            totalTickets: pool.totalTickets,
+            soldTickets: 0,
+            prizeFund: pool.prizeFund,
+            soldTicketsList: [] // Список проданных билетов
+        };
+    }
 
-            // Добавляем купленные билеты в список проданных
-            const currentPool = data.pools[ticketData.currentPool];
-            if (!currentPool.soldTicketsList) {
-                currentPool.soldTicketsList = [];
-            }
-            
-            ticketData.selectedTickets.forEach(ticketNumber => {
-                if (!currentPool.soldTicketsList.includes(ticketNumber)) {
-                    currentPool.soldTicketsList.push(ticketNumber);
-                }
-            });
-
-            // Обновляем счетчик проданных билетов
-            currentPool.soldTickets = currentPool.soldTicketsList.length;
-
-            // Обновляем статистику пользователя
-            if (!data.userProfile) data.userProfile = {};
-            data.userProfile.ticketsBought = (data.userProfile.ticketsBought || 0) + ticketData.selectedTickets.length;
-            data.userProfile.totalSpent = (data.userProfile.totalSpent || 0) + cost;
-            data.userProfile.gamesPlayed = (data.userProfile.gamesPlayed || 0) + 1;
-            
-            localStorage.setItem('tonLotteryGameData', JSON.stringify(data));
-
-            // Проверяем, заполнен ли пул после покупки
-            const isPoolFull = currentPool.soldTicketsList.length >= currentPool.totalTickets;
-            
-            // Показываем подтверждение
-            let message = `Покупка подтверждена! Билеты: ${ticketData.selectedTickets.join(', ')}\nСтоимость: ${cost} TON`;
-            if (isPoolFull) {
-                message += `\n\n🎉 Пул заполнен! Следите за информацией о розыгрыше в нашем официальном Telegram канале @ton_lottery_ton`;
-            }
-            alert(message);
-            
-            // Обновляем отображение
-            hidePurchaseModal();
-            clearSelection();
-            updatePoolInfo();
-            generateTicketsGrid();
-            
-            // Показываем сообщение о заполнении пула
-            if (isPoolFull) {
-                checkPoolCompletion();
-            }
+    // Добавляем купленные билеты в список проданных
+    const currentPool = data.pools[ticketData.currentPool];
+    if (!currentPool.soldTicketsList) {
+        currentPool.soldTicketsList = [];
+    }
+    
+    ticketData.selectedTickets.forEach(ticketNumber => {
+        if (!currentPool.soldTicketsList.includes(ticketNumber)) {
+            currentPool.soldTicketsList.push(ticketNumber);
         }
+    });
+
+    // Обновляем счетчик проданных билетов
+    currentPool.soldTickets = currentPool.soldTicketsList.length;
+
+    // Обновляем статистику пользователя
+    if (!data.userProfile) data.userProfile = {};
+    data.userProfile.ticketsBought = (data.userProfile.ticketsBought || 0) + ticketData.selectedTickets.length;
+    data.userProfile.totalSpent = (data.userProfile.totalSpent || 0) + cost;
+    data.userProfile.gamesPlayed = (data.userProfile.gamesPlayed || 0) + 1;
+    
+    localStorage.setItem('tonLotteryGameData', JSON.stringify(data));
+
+    // Проверяем, заполнен ли пул после покупки
+    const isPoolFull = currentPool.soldTicketsList.length >= currentPool.totalTickets;
+    
+    // Отправляем данные о покупке в Telegram
+    const userData = JSON.parse(localStorage.getItem('telegramUser') || '{}');
+    const purchaseData = {
+        action: 'ticket_purchase',
+        user: userData,
+        pool: {
+            id: ticketData.currentPool,
+            name: pool.name,
+            price: pool.price
+        },
+        tickets: ticketData.selectedTickets,
+        cost: cost,
+        totalCost: cost,
+        timestamp: new Date().toISOString()
+    };
+    
+    sendDataToBot(purchaseData);
+    
+    // Показываем подтверждение в Telegram
+    let message = `Покупка подтверждена! Билеты: ${ticketData.selectedTickets.join(', ')}\nСтоимость: ${cost} TON`;
+    if (isPoolFull) {
+        message += `\n\n🎉 Пул заполнен! Следите за информацией о розыгрыше в нашем официальном Telegram канале @ton_lottery_ton`;
+        
+        // Отправляем дополнительное уведомление о заполнении пула
+        const poolFullData = {
+            action: 'pool_completed',
+            pool: {
+                id: ticketData.currentPool,
+                name: pool.name
+            },
+            timestamp: new Date().toISOString()
+        };
+        sendDataToBot(poolFullData);
+    }
+    
+    // Показываем popup в Telegram
+    tg.showPopup({
+        title: '✅ Покупка завершена',
+        message: message,
+        buttons: [{ type: 'ok' }]
+    });
+    
+    // Обновляем отображение
+    hidePurchaseModal();
+    clearSelection();
+    updatePoolInfo();
+    generateTicketsGrid();
+    
+    // Показываем сообщение о заполнении пула
+    if (isPoolFull) {
+        checkPoolCompletion();
+    }
+}
 
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', initTicketPage);
