@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TON Lottery - Выбор билетов</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0088cc;
+            --primary-dark: #006699;
+            --secondary: #ff6b35;
+            --background: #0f1b2b;
+            --surface: #1a2b3e;
+            --text: #ffffff;
+            --text-secondary: #a0b3c6;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --error: #f44336;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding-bottom: 150px; /* Увеличил отступ для кнопки покупки */
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px 0;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        /* Навигация */
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px 5px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item i {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        /* Информация о пуле */
+        .pool-info {
+            background: var(--surface);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .pool-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .pool-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+        }
+
+        .progress-container {
+            margin: 10px 0;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Сообщение о заполнении пула */
+        .pool-complete-section {
+            background: linear-gradient(45deg, var(--success), #2E7D32);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .pool-complete-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .pool-complete-message {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .telegram-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 25px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+
+        .telegram-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .telegram-icon {
+            font-size: 1.2rem;
+        }
+
+        .security-warning {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            border-left: 4px solid var(--warning);
+        }
+
+        .warning-icon {
+            color: var(--warning);
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        /* Сетка билетов */
+        .tickets-section {
+            background: var(--surface);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .tickets-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .page-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .tickets-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .ticket {
+            aspect-ratio: 1;
+            background: var(--background);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .ticket:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .ticket.selected {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .ticket.sold {
+            background: rgba(244, 67, 54, 0.2);
+            border-color: var(--error);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .ticket.sold::after {
+            content: '✕';
+            position: absolute;
+            color: var(--error);
+            font-size: 1.2rem;
+        }
+
+        /* Навигация по страницам билетов */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .page-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+            background: var(--primary-dark);
+        }
+
+        .page-numbers {
+            display: flex;
+            gap: 5px;
+        }
+
+        .page-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            background: var(--background);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-number.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Выбранные билеты */
+        .selected-tickets {
+            background: var(--surface);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 80px; /* Добавил отступ для кнопки покупки */
+        }
+
+        .selected-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .clear-btn {
+            background: transparent;
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: var(--error);
+            color: white;
+        }
+
+        .selected-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 40px;
+            margin-bottom: 15px;
+        }
+
+        .selected-ticket {
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .remove-ticket {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+            padding: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-ticket:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Кнопка покупки */
+        .purchase-section {
+            background: var(--surface);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            position: fixed;
+            bottom: 80px; /* Размещаем над навигацией */
+            left: 20px;
+            right: 20px;
+            z-index: 999;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+        }
+
+        .total-cost {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .modal-tickets {
+            background: var(--background);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-confirm {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-cancel {
+            background: transparent;
+            border: 2px solid var(--text-secondary);
+            color: var(--text-secondary);
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <div class="header">
+            <h1>🎰 TON Lottery</h1>
+            <p>Выбор билетов</p>
+        </div>
+
+        <!-- Сообщение о заполнении пула -->
+        <div class="pool-complete-section" id="poolCompleteSection">
+            <div class="pool-complete-title">🎉 Пул заполнен!</div>
+            <div class="pool-complete-message">
+                Следите за информацией о розыгрыше в нашем официальном Telegram канале
+            </div>
+            <a href="https://t.me/ton_lottery_ton" target="_blank" class="telegram-link">
+                <span class="telegram-icon">📢</span>
+                @ton_lottery_ton
+            </a>
+            <div class="security-warning">
+                <span class="warning-icon">⚠️</span>
+                <strong>Внимание:</strong> Остерегайтесь мошенников! Все выплаты и покупки происходят только внутри официальной игры.
+            </div>
+        </div>
+
+        <!-- Информация о текущем пуле -->
+        <div class="pool-info">
+            <div class="pool-name" id="currentPoolName">ПУЛ 1 TON</div>
+            <div class="pool-details">
+                <div class="detail-item">
+                    <span class="detail-label">Стоимость:</span>
+                    <span id="ticketPrice">1 TON</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Осталось:</span>
+                    <span id="ticketsRemaining">1000</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Призовой фонд:</span>
+                    <span id="prizeFund">800 TON</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Призовых мест:</span>
+                    <span>20</span>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-info">
+                    <span>Прогресс заполнения</span>
+                    <span id="currentProgressText">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="currentProgress" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сетка билетов -->
+        <div class="tickets-section">
+            <div class="tickets-header">
+                <div>Выберите номера билетов</div>
+                <div class="page-info">Страница <span id="currentPage">1</span> из <span id="totalPages">40</span></div>
+            </div>
+
+            <div class="tickets-grid" id="ticketsGrid">
+                <!-- Билеты будут сгенерированы через JavaScript -->
+            </div>
+
+            <!-- Навигация по страницам -->
+            <div class="pagination">
+                <button class="page-btn" id="prevPage" onclick="changePage(-1)">‹</button>
+                
+                <div class="page-numbers" id="pageNumbers">
+                    <!-- Номера страниц будут сгенерированы -->
+                </div>
+                
+                <button class="page-btn" id="nextPage" onclick="changePage(1)">›</button>
+            </div>
+        </div>
+
+        <!-- Выбранные билеты -->
+        <div class="selected-tickets">
+            <div class="selected-header">
+                <div>Выбранные билеты</div>
+                <button class="clear-btn" onclick="clearSelection()">Очистить</button>
+            </div>
+            <div class="selected-list" id="selectedList">
+                <div style="color: var(--text-secondary); font-size: 0.9rem;">Билеты не выбраны</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кнопка покупки -->
+    <div class="purchase-section">
+        <div class="total-cost" id="totalCost">0 TON</div>
+        <button class="btn" id="purchaseBtn" onclick="showPurchaseModal()" disabled>Купить билеты</button>
+    </div>
+
+    <!-- Модальное окно подтверждения -->
+    <div class="modal" id="purchaseModal">
+        <div class="modal-content">
+            <h3>Подтверждение покупки</h3>
+            <p>Вы покупаете <span id="modalTicketCount">0</span> билетов</p>
+            <div class="modal-tickets" id="modalTicketsList">
+                <!-- Список билетов -->
+            </div>
+            <p>Общая стоимость: <span id="modalTotalCost" style="color: var(--secondary); font-weight: bold;">0 TON</span></p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-cancel" onclick="hidePurchaseModal()">Отмена</button>
+                <button class="modal-btn modal-confirm" onclick="confirmPurchase()">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <div class="navigation">
+        <a href="index.html" class="nav-item">
+            <i>🎰</i>
+            Главная
+        </a>
+        <a href="tickets.html" class="nav-item active">
+            <i>🎫</i>
+            Билеты
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i>👤</i>
+            Кабинет
+        </a>
+        <a href="rules.html" class="nav-item">
+            <i>📖</i>
+            Правила
+        </a>
+        <a href="roadmap.html" class="nav-item">
+            <i>🗺️</i>
+            Карта
+        </a>
+    </div>
+
+    <script>
+        // Данные для страницы билетов
+        const ticketData = {
+            currentPool: 1,
+            currentPage: 1,
+            ticketsPerPage: 25,
+            selectedTickets: []
+        };
+
+        // Инициализация страницы билетов
+        function initTicketPage() {
+            loadTicketData();
+            updatePoolInfo();
+            generateTicketsGrid();
+            updatePagination();
+            updateSelectedTickets();
+            checkPoolCompletion();
+        }
+
+        // Загрузка данных
+        function loadTicketData() {
+            const saved = localStorage.getItem('tonLotteryGameData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                ticketData.currentPool = data.currentPool || 1;
+            }
+        }
+
+        // Получение текущего пула
+        function getCurrentPool() {
+            const saved = localStorage.getItem('tonLotteryGameData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                return data.pools[ticketData.currentPool] || data.pools[1];
+            }
+            return { name: "ПУЛ 1 TON", price: 1, totalTickets: 1000, soldTickets: 0, prizeFund: 800 };
+        }
+
+        // Получение проданных билетов для текущего пула
+        function getSoldTickets() {
+            const saved = localStorage.getItem('tonLotteryGameData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                const pool = data.pools[ticketData.currentPool];
+                if (pool && pool.soldTicketsList) {
+                    return new Set(pool.soldTicketsList);
+                }
+            }
+            return new Set();
+        }
+
+        // Проверка заполнения пула
+        function checkPoolCompletion() {
+            const pool = getCurrentPool();
+            const soldTickets = getSoldTickets();
+            const isPoolFull = soldTickets.size >= pool.totalTickets;
+            
+            if (isPoolFull) {
+                document.getElementById('poolCompleteSection').style.display = 'block';
+            } else {
+                document.getElementById('poolCompleteSection').style.display = 'none';
+            }
+        }
+
+        // Обновление информации о пуле
+        function updatePoolInfo() {
+            const pool = getCurrentPool();
+            const soldTickets = getSoldTickets();
+            const remaining = pool.totalTickets - soldTickets.size;
+            const progress = (soldTickets.size / pool.totalTickets) * 100;
+
+            document.getElementById('currentPoolName').textContent = pool.name;
+            document.getElementById('ticketPrice').textContent = pool.price + ' TON';
+            document.getElementById('ticketsRemaining').textContent = remaining;
+            document.getElementById('prizeFund').textContent = pool.prizeFund + ' TON';
+            document.getElementById('currentProgressText').textContent = Math.round(progress) + '%';
+            document.getElementById('currentProgress').style.width = progress + '%';
+            
+            // Обновляем общее количество страниц
+            const totalPages = Math.ceil(pool.totalTickets / ticketData.ticketsPerPage);
+            document.getElementById('totalPages').textContent = totalPages;
+        }
+
+        // Генерация сетки билетов
+        function generateTicketsGrid() {
+            const grid = document.getElementById('ticketsGrid');
+            grid.innerHTML = '';
+
+            const pool = getCurrentPool();
+            const soldTickets = getSoldTickets();
+            const startTicket = (ticketData.currentPage - 1) * ticketData.ticketsPerPage + 1;
+            const endTicket = Math.min(startTicket + ticketData.ticketsPerPage - 1, pool.totalTickets);
+
+            for (let i = startTicket; i <= endTicket; i++) {
+                const ticket = document.createElement('div');
+                ticket.className = 'ticket';
+                ticket.textContent = i;
+                
+                if (soldTickets.has(i)) {
+                    ticket.classList.add('sold');
+                } else if (ticketData.selectedTickets.includes(i)) {
+                    ticket.classList.add('selected');
+                } else {
+                    ticket.onclick = () => toggleTicketSelection(i);
+                }
+                
+                grid.appendChild(ticket);
+            }
+
+            document.getElementById('currentPage').textContent = ticketData.currentPage;
+        }
+
+        // Выбор/отмена выбора билета
+        function toggleTicketSelection(ticketNumber) {
+            const index = ticketData.selectedTickets.indexOf(ticketNumber);
+            const pool = getCurrentPool();
+            const soldTickets = getSoldTickets();
+            const maxTickets = pool.totalTickets - soldTickets.size;
+
+            if (index === -1) {
+                // Проверяем лимит
+                if (ticketData.selectedTickets.length >= maxTickets) {
+                    alert(`Можно выбрать не более ${maxTickets} билетов!`);
+                    return;
+                }
+                ticketData.selectedTickets.push(ticketNumber);
+            } else {
+                ticketData.selectedTickets.splice(index, 1);
+            }
+
+            updateSelectedTickets();
+            generateTicketsGrid(); // Перерисовываем для обновления стилей
+        }
+
+        // Обновление списка выбранных билетов
+        function updateSelectedTickets() {
+            const selectedList = document.getElementById('selectedList');
+            const totalCost = document.getElementById('totalCost');
+            const purchaseBtn = document.getElementById('purchaseBtn');
+
+            selectedList.innerHTML = '';
+
+            if (ticketData.selectedTickets.length === 0) {
+                selectedList.innerHTML = '<div style="color: var(--text-secondary); font-size: 0.9rem;">Билеты не выбраны</div>';
+                totalCost.textContent = '0 TON';
+                purchaseBtn.disabled = true;
+            } else {
+                ticketData.selectedTickets.forEach(ticketNumber => {
+                    const ticketElement = document.createElement('div');
+                    ticketElement.className = 'selected-ticket';
+                    ticketElement.innerHTML = `
+                        #${ticketNumber}
+                        <button class="remove-ticket" onclick="removeTicket(${ticketNumber})">×</button>
+                    `;
+                    selectedList.appendChild(ticketElement);
+                });
+
+                const pool = getCurrentPool();
+                const cost = ticketData.selectedTickets.length * pool.price;
+                totalCost.textContent = cost + ' TON';
+                purchaseBtn.disabled = false;
+            }
+        }
+
+        // Удаление билета из выбранных
+        function removeTicket(ticketNumber) {
+            const index = ticketData.selectedTickets.indexOf(ticketNumber);
+            if (index > -1) {
+                ticketData.selectedTickets.splice(index, 1);
+                updateSelectedTickets();
+                generateTicketsGrid();
+            }
+        }
+
+        // Очистка выбора
+        function clearSelection() {
+            if (ticketData.selectedTickets.length > 0) {
+                if (confirm('Очистить все выбранные билеты?')) {
+                    ticketData.selectedTickets = [];
+                    updateSelectedTickets();
+                    generateTicketsGrid();
+                }
+            }
+        }
+
+        // Смена страницы
+        function changePage(direction) {
+            const pool = getCurrentPool();
+            const totalPages = Math.ceil(pool.totalTickets / ticketData.ticketsPerPage);
+            const newPage = ticketData.currentPage + direction;
+
+            if (newPage >= 1 && newPage <= totalPages) {
+                ticketData.currentPage = newPage;
+                generateTicketsGrid();
+                updatePagination();
+            }
+        }
+
+        // Обновление пагинации
+        function updatePagination() {
+            const pool = getCurrentPool();
+            const totalPages = Math.ceil(pool.totalTickets / ticketData.ticketsPerPage);
+            const pageNumbers = document.getElementById('pageNumbers');
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+
+            pageNumbers.innerHTML = '';
+            
+            // Показываем только 5 страниц вокруг текущей
+            const startPage = Math.max(1, ticketData.currentPage - 2);
+            const endPage = Math.min(totalPages, startPage + 4);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('div');
+                pageBtn.className = 'page-number' + (i === ticketData.currentPage ? ' active' : '');
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => goToPage(i);
+                pageNumbers.appendChild(pageBtn);
+            }
+
+            prevBtn.disabled = ticketData.currentPage === 1;
+            nextBtn.disabled = ticketData.currentPage === totalPages;
+        }
+
+        // Переход на конкретную страницу
+        function goToPage(page) {
+            ticketData.currentPage = page;
+            generateTicketsGrid();
+            updatePagination();
+        }
+
+        // Показать модальное окно покупки
+        function showPurchaseModal() {
+            const modal = document.getElementById('purchaseModal');
+            const ticketCount = document.getElementById('modalTicketCount');
+            const ticketsList = document.getElementById('modalTicketsList');
+            const totalCost = document.getElementById('modalTotalCost');
+
+            const pool = getCurrentPool();
+            const cost = ticketData.selectedTickets.length * pool.price;
+
+            ticketCount.textContent = ticketData.selectedTickets.length;
+            totalCost.textContent = cost + ' TON';
+
+            // Показываем выбранные билеты
+            ticketsList.innerHTML = '';
+            const ticketsText = document.createElement('div');
+            ticketsText.textContent = 'Билеты: ' + ticketData.selectedTickets.join(', ');
+            ticketsList.appendChild(ticketsText);
+
+            modal.classList.add('active');
+        }
+
+        // Скрыть модальное окно
+        function hidePurchaseModal() {
+            document.getElementById('purchaseModal').classList.remove('active');
+        }
+
+        // Подтверждение покупки
+        function confirmPurchase() {
+            const pool = getCurrentPool();
+            const cost = ticketData.selectedTickets.length * pool.price;
+
+            // Сохраняем покупку в localStorage
+            const saved = localStorage.getItem('tonLotteryGameData');
+            let data = saved ? JSON.parse(saved) : { pools: {}, userProfile: {} };
+            
+            // Инициализируем пул если его нет
+            if (!data.pools[ticketData.currentPool]) {
+                data.pools[ticketData.currentPool] = {
+                    name: pool.name,
+                    price: pool.price,
+                    totalTickets: pool.totalTickets,
+                    soldTickets: 0,
+                    prizeFund: pool.prizeFund,
+                    soldTicketsList: [] // Список проданных билетов
+                };
+            }
+
+            // Добавляем купленные билеты в список проданных
+            const currentPool = data.pools[ticketData.currentPool];
+            if (!currentPool.soldTicketsList) {
+                currentPool.soldTicketsList = [];
+            }
+            
+            ticketData.selectedTickets.forEach(ticketNumber => {
+                if (!currentPool.soldTicketsList.includes(ticketNumber)) {
+                    currentPool.soldTicketsList.push(ticketNumber);
+                }
+            });
+
+            // Обновляем счетчик проданных билетов
+            currentPool.soldTickets = currentPool.soldTicketsList.length;
+
+            // Обновляем статистику пользователя
+            if (!data.userProfile) data.userProfile = {};
+            data.userProfile.ticketsBought = (data.userProfile.ticketsBought || 0) + ticketData.selectedTickets.length;
+            data.userProfile.totalSpent = (data.userProfile.totalSpent || 0) + cost;
+            data.userProfile.gamesPlayed = (data.userProfile.gamesPlayed || 0) + 1;
+            
+            localStorage.setItem('tonLotteryGameData', JSON.stringify(data));
+
+            // Проверяем, заполнен ли пул после покупки
+            const isPoolFull = currentPool.soldTicketsList.length >= currentPool.totalTickets;
+            
+            // Показываем подтверждение
+            let message = `Покупка подтверждена! Билеты: ${ticketData.selectedTickets.join(', ')}\nСтоимость: ${cost} TON`;
+            if (isPoolFull) {
+                message += `\n\n🎉 Пул заполнен! Следите за информацией о розыгрыше в нашем официальном Telegram канале @ton_lottery_ton`;
+            }
+            alert(message);
+            
+            // Обновляем отображение
+            hidePurchaseModal();
+            clearSelection();
+            updatePoolInfo();
+            generateTicketsGrid();
+            
+            // Показываем сообщение о заполнении пула
+            if (isPoolFull) {
+                checkPoolCompletion();
+            }
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', initTicketPage);
+    </script>
+</body>
+</html>
