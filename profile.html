@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TON Lottery - Личный кабинет</title>
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -642,6 +644,10 @@
     </style>
 </head>
 <body>
+
+<!-- Кнопка возврата для Telegram -->
+<button class="back-btn" onclick="goBack()" style="position: fixed; top: 15px; left: 15px; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 40px; height: 40px; color: white; font-size: 18px; cursor: pointer; z-index: 1001;">←</button>
+
     <div class="container">
         <!-- Шапка -->
         <div class="header">
@@ -828,8 +834,129 @@
             Карта
         </a>
     </div>
-
     <script>
+        // Telegram Web App Integration
+        const tg = window.Telegram.WebApp;
+        
+        // Функция для отправки данных в бот
+        function sendDataToBot(data) {
+            if (tg && tg.sendData) {
+                console.log('Отправляем данные в бот:', data);
+                tg.sendData(JSON.stringify(data));
+            }
+        }
+        
+        // Функция для закрытия Web App
+        function closeWebApp() {
+            if (tg && tg.close) {
+                tg.close();
+            }
+        }
+        
+        // Функция возврата
+        function goBack() {
+            if (tg && tg.BackButton) {
+                closeWebApp();
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Инициализация Telegram
+        function initTelegram() {
+            if (tg && tg.initData) {
+                console.log('Запущено в Telegram Web App');
+                
+                // Раскрываем на весь экран
+                tg.expand();
+                
+                // Показываем кнопку "Назад"
+                tg.BackButton.show();
+                tg.BackButton.onClick(closeWebApp);
+                
+                // Получаем данные пользователя Telegram
+                const telegramUser = tg.initDataUnsafe?.user;
+                if (telegramUser) {
+                    console.log('Данные пользователя Telegram:', telegramUser);
+                    
+                    // Сохраняем данные пользователя
+                    const userData = {
+                        id: telegramUser.id,
+                        first_name: telegramUser.first_name,
+                        username: telegramUser.username,
+                        language_code: telegramUser.language_code,
+                        is_premium: telegramUser.is_premium || false
+                    };
+                    localStorage.setItem('telegramUser', JSON.stringify(userData));
+                    
+                    // Обновляем профиль данными из Telegram
+                    updateProfileWithTelegramData(telegramUser);
+                }
+                
+                // Говорим Telegram, что приложение готово
+                tg.ready();
+                
+                // Отправляем событие просмотра профиля
+                sendProfileViewEvent();
+                
+            } else {
+                console.log('Запущено в браузере');
+            }
+        }
+
+        // Обновление профиля данными из Telegram
+        function updateProfileWithTelegramData(telegramUser) {
+            if (telegramUser.first_name) {
+                document.getElementById('userName').textContent = telegramUser.first_name;
+                // Создаем аватар из первой буквы имени
+                const firstLetter = telegramUser.first_name.charAt(0).toUpperCase();
+                document.getElementById('userAvatar').textContent = firstLetter;
+            }
+            
+            if (telegramUser.id) {
+                document.getElementById('userId').textContent = telegramUser.id;
+            }
+        }
+
+        // Отправка события просмотра профиля
+        function sendProfileViewEvent() {
+            const telegramUser = JSON.parse(localStorage.getItem('telegramUser') || '{}');
+            const profileData = {
+                action: 'profile_viewed',
+                user: telegramUser,
+                timestamp: new Date().toISOString(),
+                section: 'wallet' // текущий активный раздел
+            };
+            
+            sendDataToBot(profileData);
+        }
+
+        // Отправка события смены раздела
+        function sendSectionChangeEvent(sectionName) {
+            const telegramUser = JSON.parse(localStorage.getItem('telegramUser') || '{}');
+            const sectionData = {
+                action: 'profile_section_changed',
+                user: telegramUser,
+                section: sectionName,
+                timestamp: new Date().toISOString()
+            };
+            
+            sendDataToBot(sectionData);
+        }
+
+        // Отправка события подключения кошелька
+        function sendWalletConnectEvent() {
+            const telegramUser = JSON.parse(localStorage.getItem('telegramUser') || '{}');
+            const walletData = {
+                action: 'wallet_connected',
+                user: telegramUser,
+                wallet_address: userData.profile.walletAddress,
+                timestamp: new Date().toISOString()
+            };
+            
+            sendDataToBot(walletData);
+        }
+
         // Данные пользователя
         const userData = {
             profile: {
@@ -850,11 +977,26 @@
 
         // Инициализация личного кабинета
         function initProfilePage() {
+            // Инициализируем Telegram
+            initTelegram();
+            
+            // Загружаем данные
             loadUserData();
             updateProfileHeader();
             loadTransactions();
             loadMyTickets();
             loadTopPlayers();
+            
+            // Показываем уведомление в Telegram
+            if (tg && tg.showPopup) {
+                setTimeout(() => {
+                    tg.showPopup({
+                        title: '👤 Личный кабинет',
+                        message: 'Здесь вы можете управлять кошельком и смотреть статистику',
+                        buttons: [{ type: 'ok' }]
+                    });
+                }, 1000);
+            }
         }
 
         // Загрузка данных пользователя
@@ -873,6 +1015,15 @@
                 if (data.userTickets) {
                     userData.myTickets = data.userTickets;
                 }
+            }
+            
+            // Загружаем данные пользователя Telegram
+            const telegramUser = JSON.parse(localStorage.getItem('telegramUser') || '{}');
+            if (telegramUser.first_name && !userData.profile.name.includes('Гость')) {
+                userData.profile.name = telegramUser.first_name;
+            }
+            if (telegramUser.id) {
+                userData.profile.userId = telegramUser.id;
             }
         }
 
@@ -1004,7 +1155,16 @@
         // Подключение кошелька
         function connectWallet() {
             if (userData.profile.walletConnected) {
-                alert('Кошелек уже подключен!');
+                // Показываем уведомление в Telegram
+                if (tg && tg.showPopup) {
+                    tg.showPopup({
+                        title: 'ℹ️ Информация',
+                        message: 'Кошелек уже подключен!',
+                        buttons: [{ type: 'ok' }]
+                    });
+                } else {
+                    alert('Кошелек уже подключен!');
+                }
                 return;
             }
 
@@ -1013,7 +1173,15 @@
             
             userData.profile.walletConnected = true;
             userData.profile.walletAddress = walletAddress;
-            userData.profile.name = 'Игрок #' + Math.floor(Math.random() * 10000);
+            
+            // Используем имя из Telegram если есть
+            const telegramUser = JSON.parse(localStorage.getItem('telegramUser') || '{}');
+            if (telegramUser.first_name) {
+                userData.profile.name = telegramUser.first_name;
+            } else {
+                userData.profile.name = 'Игрок #' + Math.floor(Math.random() * 10000);
+            }
+            
             userData.profile.walletBalance = 50; // Начальный баланс
             
             // Добавляем транзакцию пополнения
@@ -1028,7 +1196,19 @@
             updateProfileHeader();
             loadTransactions();
             
-            alert('TON кошелек успешно подключен!');
+            // Отправляем событие подключения кошелька
+            sendWalletConnectEvent();
+            
+            // Показываем уведомление в Telegram
+            if (tg && tg.showPopup) {
+                tg.showPopup({
+                    title: '✅ Успех!',
+                    message: 'TON кошелек успешно подключен!',
+                    buttons: [{ type: 'ok' }]
+                });
+            } else {
+                alert('TON кошелек успешно подключен!');
+            }
         }
 
         // Переключение разделов
@@ -1045,6 +1225,9 @@
             });
             document.getElementById(sectionName + 'Section').classList.add('active');
 
+            // Отправляем событие смены раздела
+            sendSectionChangeEvent(sectionName);
+
             // Если перешли в раздел "Мои билеты", обновляем его
             if (sectionName === 'tickets') {
                 loadMyTickets();
@@ -1055,7 +1238,16 @@
         // Показать модальное окно внесения средств
         function showDepositModal() {
             if (!userData.profile.walletConnected) {
-                alert('Сначала подключите TON кошелек!');
+                // Показываем уведомление в Telegram
+                if (tg && tg.showPopup) {
+                    tg.showPopup({
+                        title: '⚠️ Внимание',
+                        message: 'Сначала подключите TON кошелек!',
+                        buttons: [{ type: 'ok' }]
+                    });
+                } else {
+                    alert('Сначала подключите TON кошелек!');
+                }
                 return;
             }
             document.getElementById('depositModal').classList.add('active');
@@ -1070,7 +1262,16 @@
         // Показать модальное окно вывода средств
         function showWithdrawModal() {
             if (!userData.profile.walletConnected) {
-                alert('Сначала подключите TON кошелек!');
+                // Показываем уведомление в Telegram
+                if (tg && tg.showPopup) {
+                    tg.showPopup({
+                        title: '⚠️ Внимание',
+                        message: 'Сначала подключите TON кошелек!',
+                        buttons: [{ type: 'ok' }]
+                    });
+                } else {
+                    alert('Сначала подключите TON кошелек!');
+                }
                 return;
             }
             document.getElementById('withdrawModal').classList.add('active');
@@ -1087,7 +1288,16 @@
         function confirmDeposit() {
             const depositAddress = userData.profile.walletAddress;
             navigator.clipboard.writeText(depositAddress).then(() => {
-                alert('Адрес для пополнения скопирован в буфер обмена!');
+                // Показываем уведомление в Telegram
+                if (tg && tg.showPopup) {
+                    tg.showPopup({
+                        title: '📋 Скопировано',
+                        message: 'Адрес для пополнения скопирован в буфер обмена!',
+                        buttons: [{ type: 'ok' }]
+                    });
+                } else {
+                    alert('Адрес для пополнения скопирован в буфер обмена!');
+                }
                 hideDepositModal();
             });
         }
@@ -1128,7 +1338,16 @@
             updateProfileHeader();
             loadTransactions();
             
-            alert(`Запрос на вывод ${amount} TON отправлен!`);
+            // Показываем уведомление в Telegram
+            if (tg && tg.showPopup) {
+                tg.showPopup({
+                    title: '✅ Запрос отправлен',
+                    message: `Запрос на вывод ${amount} TON отправлен на обработку!`,
+                    buttons: [{ type: 'ok' }]
+                });
+            } else {
+                alert(`Запрос на вывод ${amount} TON отправлен!`);
+            }
             hideWithdrawModal();
         }
 
@@ -1229,5 +1448,5 @@
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', initProfilePage);
     </script>
-</body>
+ </body>
 </html>
