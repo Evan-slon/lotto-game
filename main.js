@@ -2,7 +2,7 @@
 let currentPage = 'home';
 let currentPoolId = null;
 let currentTicketPage = 0;
-const TICKETS_PER_PAGE = 25;
+const TICKETS_PER_PAGE = 25; // 5x5 сетка
 
 // ===== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -46,6 +46,29 @@ function setupEventListeners() {
     
     // Кнопка подключения кошелька
     $('#connectWalletBtn').addEventListener('click', handleWalletConnect);
+    
+    // Обработка изменения ориентации экрана
+    window.addEventListener('resize', debounce(handleResize, 250));
+    window.addEventListener('orientationchange', debounce(handleResize, 250));
+}
+
+function handleResize() {
+    // Перерисовываем сетку билетов при изменении размера экрана
+    if (currentPage === 'choose-tickets' && currentPoolId) {
+        generateTicketsForPage();
+    }
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
 // ===== УПРАВЛЕНИЕ НАВИГАЦИЕЙ =====
@@ -213,7 +236,7 @@ function generatePoolCards(compact = false) {
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">Призовой фонд</div>
-                        <div class="stat-value">${formatCurrency(pool.prizeFund)}</div>
+                        <div class="stat-card-value">${formatCurrency(pool.prizeFund)}</div>
                     </div>
                     ${!compact ? `
                     <div class="stat-item">
@@ -479,7 +502,7 @@ function toggleTicketSelection(ticketNumber) {
         
         // Анимация
         if (ticketElement) {
-            ticketElement.style.transform = 'scale(1.1)';
+            ticketElement.style.transform = 'scale(1.05)';
             setTimeout(() => {
                 ticketElement.style.transform = 'scale(1)';
             }, 200);
@@ -594,7 +617,7 @@ function generateTicketsList(tickets) {
         if (!pool) return;
         
         html += `
-            <div class="pool-section mb-3">
+            <div class="pool-section mb-2">
                 <h3>${pool.name} (${pool.ticketPrice} TON)</h3>
         `;
         
@@ -605,7 +628,7 @@ function generateTicketsList(tickets) {
                              ticket.status === 'lost' ? 'Не выиграл' : 'Ожидание розыгрыша';
             
             html += `
-                <div class="ticket-item">
+                <div class="ticket-item mt-1">
                     <div class="ticket-info">
                         <h4>Билет №${ticket.number}</h4>
                         <div class="ticket-meta">
