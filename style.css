@@ -61,7 +61,7 @@ body {
 /* РЁР°РїРєР° */
 .app-header {
     background: var(--color-dark-alt);
-    padding: 1rem 1.5rem;
+    padding: 1rem 1rem;
     border-bottom: 2px solid var(--color-accent);
     position: sticky;
     top: 0;
@@ -72,21 +72,22 @@ body {
 .header-content {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .back-btn {
     background: transparent;
     border: 2px solid var(--color-gray);
     color: var(--color-white);
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.8rem;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
     cursor: pointer;
     transition: var(--transition);
-    min-width: 100px;
+    min-width: auto;
+    font-size: 0.9rem;
 }
 
 .back-btn:hover {
@@ -97,26 +98,28 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.8rem;
     flex: 1;
 }
 
 .logo-icon {
     background: linear-gradient(135deg, var(--color-accent), var(--color-yellow));
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color: var(--color-dark);
+    flex-shrink: 0;
 }
 
 .logo-text h1 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 800;
     letter-spacing: -0.5px;
+    line-height: 1.2;
 }
 
 .jetton-text {
@@ -128,24 +131,25 @@ body {
 
 .tagline {
     color: var(--color-gray);
-    font-size: 0.9rem;
-    margin-top: -3px;
+    font-size: 0.8rem;
+    margin-top: -2px;
 }
 
 .wallet-btn {
     background: linear-gradient(135deg, var(--color-accent), #ff4d1a);
     color: white;
     border: none;
-    padding: 0.8rem 1.5rem;
+    padding: 0.6rem 1rem;
     border-radius: var(--radius-md);
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.9rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
     transition: var(--transition);
     box-shadow: var(--shadow-sm);
+    white-space: nowrap;
 }
 
 .wallet-btn:hover {
@@ -155,29 +159,32 @@ body {
 
 .wallet-info {
     background: var(--color-card);
-    padding: 0.8rem 1.2rem;
+    padding: 0.6rem 1rem;
     border-radius: var(--radius-md);
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.2rem;
     border-left: 3px solid var(--color-green);
+    min-width: 140px;
 }
 
 .wallet-address {
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .wallet-balance {
     color: var(--color-green);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 /* РћСЃРЅРѕРІРЅРѕР№ РєРѕРЅС‚РµРЅС‚ */
 .main-content {
     flex: 1;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1rem;
 }
 
 /* РќР°РІРёРіР°С†РёСЏ */
@@ -189,7 +196,7 @@ body {
     background: var(--color-dark-alt);
     display: flex;
     justify-content: space-around;
-    padding: 0.8rem 0;
+    padding: 0.6rem 0;
     border-top: 1px solid var(--color-border);
     z-index: 100;
     backdrop-filter: blur(10px);
@@ -203,17 +210,17 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.5rem 1rem;
+    gap: 0.2rem;
+    padding: 0.4rem 0.8rem;
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: var(--transition);
-    font-size: 0.85rem;
-    min-width: 70px;
+    font-size: 0.75rem;
+    min-width: 60px;
 }
 
 .nav-btn i {
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 .nav-btn.active {
@@ -240,29 +247,31 @@ body {
 .pools-container {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.2rem;
 }
 
 .page-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
     margin-bottom: 0.5rem;
     color: var(--color-white);
+    line-height: 1.2;
 }
 
 .page-subtitle {
     color: var(--color-gray);
-    margin-bottom: 2rem;
-    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    font-size: 0.95rem;
 }
 
 /* РљР°СЂС‚РѕС‡РєРё РїСѓР»РѕРІ */
 .pool-card {
     background: var(--color-card);
     border-radius: var(--radius-lg);
-    padding: 1.8rem;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: 1rem;
     border: 1px solid var(--color-border);
     transition: var(--transition);
     position: relative;
@@ -271,7 +280,7 @@ body {
 }
 
 .pool-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
     border-color: var(--color-accent);
 }
@@ -281,7 +290,7 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 6px;
+    width: 5px;
     height: 100%;
     background: linear-gradient(to bottom, var(--color-accent), var(--color-yellow));
 }
@@ -289,43 +298,46 @@ body {
 .pool-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 1rem;
 }
 
 .pool-title {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
+    line-height: 1.2;
 }
 
 .pool-price {
     background: linear-gradient(135deg, var(--color-accent), #ff4d1a);
     color: white;
-    padding: 0.5rem 1.2rem;
+    padding: 0.4rem 1rem;
     border-radius: var(--radius-xl);
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 1rem;
+    white-space: nowrap;
 }
 
 .pool-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.8rem;
 }
 
 .stat-item {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.2rem;
 }
 
 .stat-label {
     color: var(--color-gray);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .stat-value {
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: var(--color-white);
 }
 
@@ -334,7 +346,7 @@ body {
 }
 
 .progress-bar {
-    height: 10px;
+    height: 8px;
     background: var(--color-border);
     border-radius: var(--radius-xl);
     overflow: hidden;
@@ -350,8 +362,8 @@ body {
 .progress-text {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
+    margin-top: 0.3rem;
+    font-size: 0.8rem;
     color: var(--color-gray);
 }
 
@@ -360,26 +372,24 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid var(--color-border);
 }
 
 .pool-header-info {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 1rem;
 }
 
 .pool-info-badge {
     background: var(--color-card);
-    padding: 0.8rem 1.5rem;
+    padding: 1rem;
     border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
     border-left: 4px solid var(--color-accent);
 }
 
@@ -390,56 +400,58 @@ body {
 }
 
 .pool-info-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--color-gray);
 }
 
 .pool-info-value {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--color-white);
 }
 
 .pool-prize-info {
     background: linear-gradient(135deg, rgba(20, 167, 108, 0.2), rgba(255, 229, 0, 0.2));
-    padding: 1rem;
+    padding: 0.8rem;
     border-radius: var(--radius-md);
     border: 1px solid var(--color-green);
-}
-
-.prize-amount {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--color-yellow);
     text-align: center;
 }
 
-/* РЎРµС‚РєР° РЅРѕРјРµСЂРѕРІ */
+.prize-amount {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-yellow);
+}
+
+/* РЎРµС‚РєР° РЅРѕРјРµСЂРѕРІ - Р¤РРљРЎРР РћР’РђРќРќРђРЇ 5x5 */
 .tickets-section {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
 }
 
 .tickets-navigation {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
-    margin: 2rem 0;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
 }
 
 .nav-arrow {
     background: var(--color-card);
     color: var(--color-white);
     border: none;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: var(--transition);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .nav-arrow:hover:not(:disabled) {
@@ -454,21 +466,22 @@ body {
 
 .current-page-indicator {
     background: var(--color-card);
-    padding: 0.8rem 1.5rem;
+    padding: 0.6rem 1rem;
     border-radius: var(--radius-md);
     font-weight: 600;
-    min-width: 200px;
+    font-size: 0.9rem;
     text-align: center;
+    min-width: 180px;
 }
 
+/* РЎРµС‚РєР° Р±РёР»РµС‚РѕРІ 5x5 */
 .tickets-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 0.8rem;
-    margin: 2rem 0;
+    gap: 0.6rem;
+    margin: 0 auto;
     max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
 }
 
 .ticket-number {
@@ -479,11 +492,13 @@ body {
     background: var(--color-card);
     border-radius: var(--radius-md);
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: var(--transition);
     border: 2px solid transparent;
     user-select: none;
+    position: relative;
+    min-height: 0;
 }
 
 .ticket-number:hover:not(.sold) {
@@ -510,17 +525,17 @@ body {
     content: 'вњ—';
     position: absolute;
     color: var(--color-error);
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 /* РџР°РЅРµР»СЊ РїРѕРєСѓРїРєРё */
 .buy-panel {
     position: fixed;
-    bottom: 80px;
+    bottom: 0;
     left: 0;
     right: 0;
     background: var(--color-dark-alt);
-    padding: 1.5rem;
+    padding: 1rem;
     border-top: 2px solid var(--color-accent);
     box-shadow: var(--shadow-lg);
     z-index: 99;
@@ -537,7 +552,7 @@ body {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .selected-info-row {
@@ -545,11 +560,12 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .selected-count {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    white-space: nowrap;
 }
 
 .selected-count span {
@@ -558,8 +574,9 @@ body {
 }
 
 .total-price {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 700;
+    white-space: nowrap;
 }
 
 .total-price span {
@@ -568,14 +585,14 @@ body {
 
 .buy-actions {
     display: flex;
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .btn {
-    padding: 0.8rem 1.8rem;
+    padding: 0.7rem 1.5rem;
     border-radius: var(--radius-md);
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.9rem;
     border: none;
     cursor: pointer;
     transition: var(--transition);
@@ -583,6 +600,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    white-space: nowrap;
 }
 
 .btn-primary {
@@ -617,42 +635,47 @@ body {
 .my-tickets-container {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.2rem;
 }
 
 .ticket-item {
     background: var(--color-card);
     border-radius: var(--radius-lg);
-    padding: 1.5rem;
+    padding: 1.2rem;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     border-left: 4px solid var(--color-accent);
     transition: var(--transition);
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .ticket-item:hover {
-    transform: translateX(5px);
+    transform: translateX(3px);
 }
 
 .ticket-info {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: 100%;
 }
 
 .ticket-meta {
     display: flex;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0.8rem;
     color: var(--color-gray);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .ticket-status {
-    padding: 0.3rem 0.8rem;
+    padding: 0.2rem 0.6rem;
     border-radius: var(--radius-xl);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .status-pending {
@@ -674,62 +697,65 @@ body {
 .profile-header {
     display: flex;
     align-items: center;
-    gap: 2rem;
-    margin-bottom: 3rem;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-direction: column;
+    text-align: center;
 }
 
 .avatar {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--color-accent), var(--color-yellow));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: var(--color-dark);
     font-weight: 700;
 }
 
 .user-info h2 {
-    font-size: 2rem;
+    font-size: 1.6rem;
     margin-bottom: 0.5rem;
 }
 
 .user-address {
     color: var(--color-gray);
     font-family: monospace;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    word-break: break-all;
 }
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
 }
 
 .stat-card {
     background: var(--color-card);
-    padding: 1.5rem;
+    padding: 1.2rem;
     border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 0.6rem;
 }
 
 .stat-card i {
-    font-size: 2rem;
+    font-size: 1.8rem;
     color: var(--color-accent);
 }
 
 .stat-card-title {
     color: var(--color-gray);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .stat-card-value {
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: var(--color-white);
 }
@@ -743,45 +769,48 @@ body {
 .rules-section {
     background: var(--color-card);
     border-radius: var(--radius-lg);
-    padding: 2rem;
-    margin-bottom: 2rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .rules-section h2 {
     color: var(--color-accent);
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
 }
 
 .rules-list {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .rule-item {
     display: flex;
-    gap: 1rem;
-    padding: 1rem;
+    gap: 0.8rem;
+    padding: 0.8rem;
     background: var(--color-dark-alt);
     border-radius: var(--radius-md);
+    align-items: flex-start;
 }
 
 .rule-number {
     background: var(--color-accent);
     color: white;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     flex-shrink: 0;
+    font-size: 0.9rem;
 }
 
 .rule-text {
-    line-height: 1.6;
+    line-height: 1.5;
+    font-size: 0.9rem;
 }
 
 .rule-text strong {
@@ -801,14 +830,15 @@ body {
     justify-content: center;
     z-index: 1000;
     animation: fadeIn 0.3s ease;
+    padding: 1rem;
 }
 
 .modal-content {
     background: var(--color-card);
     border-radius: var(--radius-lg);
-    padding: 2rem;
-    width: 90%;
-    max-width: 500px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 400px;
     max-height: 90vh;
     overflow-y: auto;
     animation: slideUp 0.3s ease;
@@ -824,11 +854,11 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
 }
 
 .modal-title {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--color-white);
 }
@@ -847,14 +877,16 @@ body {
 }
 
 .modal-body {
-    line-height: 1.6;
+    line-height: 1.5;
     color: var(--color-gray);
+    font-size: 0.9rem;
 }
 
 .modal-actions {
     display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+    flex-direction: column;
 }
 
 /* РЈРІРµРґРѕРјР»РµРЅРёСЏ */
@@ -863,7 +895,7 @@ body {
     top: 20px;
     right: 20px;
     background: var(--color-card);
-    padding: 1rem 1.5rem;
+    padding: 1rem 1.2rem;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
@@ -871,7 +903,7 @@ body {
     z-index: 1001;
     animation: slideInRight 0.3s ease;
     border-left: 4px solid var(--color-green);
-    max-width: 400px;
+    max-width: 350px;
     box-shadow: var(--shadow-lg);
 }
 
@@ -889,7 +921,7 @@ body {
 }
 
 .notification-icon {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
 .notification.success .notification-icon {
@@ -914,34 +946,48 @@ body {
 }
 
 .mt-1 { margin-top: 1rem; }
-.mt-2 { margin-top: 2rem; }
-.mt-3 { margin-top: 3rem; }
+.mt-2 { margin-top: 1.5rem; }
+.mt-3 { margin-top: 2rem; }
 .mb-1 { margin-bottom: 1rem; }
-.mb-2 { margin-bottom: 2rem; }
-.mb-3 { margin-bottom: 3rem; }
+.mb-2 { margin-bottom: 1.5rem; }
+.mb-3 { margin-bottom: 2rem; }
 
-/* РђРґР°РїС‚РёРІРЅРѕСЃС‚СЊ */
-@media (max-width: 768px) {
-    .header-content {
-        flex-wrap: wrap;
+/* РђРґР°РїС‚РёРІРЅРѕСЃС‚СЊ РґР»СЏ РѕС‡РµРЅСЊ РјР°Р»РµРЅСЊРєРёС… СЌРєСЂР°РЅРѕРІ */
+@media (max-width: 480px) {
+    .app-header {
+        padding: 0.8rem;
     }
     
-    .logo {
-        order: 2;
-        flex: 1;
-        justify-content: center;
+    .logo-text h1 {
+        font-size: 1.3rem;
     }
     
-    .back-btn {
-        order: 1;
+    .tagline {
+        font-size: 0.7rem;
     }
     
-    .wallet-connect {
-        order: 3;
-        width: 100%;
-        margin-top: 1rem;
-        display: flex;
-        justify-content: center;
+    .wallet-btn span {
+        display: none;
+    }
+    
+    .wallet-btn {
+        padding: 0.6rem;
+    }
+    
+    .main-content {
+        padding: 1rem;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .page-subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .pool-card {
+        padding: 1.2rem;
     }
     
     .pool-stats {
@@ -949,41 +995,138 @@ body {
     }
     
     .tickets-grid {
-        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
     }
     
-    .buy-actions {
-        flex-direction: column;
-    }
-    
-    .pool-header-info {
-        flex-direction: column;
-        align-items: flex-start;
+    .ticket-number {
+        font-size: 0.9rem;
     }
     
     .pool-info-badge {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .tickets-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: 1fr;
     }
     
     .nav-btn span {
         display: none;
     }
     
-    .logo-text h1 {
-        font-size: 1.3rem;
+    .nav-btn {
+        min-width: 50px;
+        padding: 0.3rem;
     }
     
-    .logo-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.5rem;
+    .btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .buy-actions {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        padding: 1.2rem;
+    }
+    
+    .notification {
+        max-width: 300px;
+        padding: 0.8rem 1rem;
+        right: 10px;
+        left: 10px;
+    }
+}
+
+/* РђРґР°РїС‚РёРІРЅРѕСЃС‚СЊ РґР»СЏ СЃСЂРµРґРЅРёС… СЌРєСЂР°РЅРѕРІ */
+@media (min-width: 481px) and (max-width: 768px) {
+    .pool-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .tickets-grid {
+        max-width: 450px;
+    }
+    
+    .pool-info-badge {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .modal-actions {
+        flex-direction: row;
+    }
+}
+
+/* РђРґР°РїС‚РёРІРЅРѕСЃС‚СЊ РґР»СЏ Р±РѕР»СЊС€РёС… СЌРєСЂР°РЅРѕРІ */
+@media (min-width: 769px) {
+    .app-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .main-content {
+        padding: 2rem 1.5rem;
+    }
+    
+    .ticket-item {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .ticket-info {
+        width: auto;
+    }
+    
+    .profile-header {
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .modal-actions {
+        flex-direction: row;
+    }
+    
+    .pool-header-info {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .pool-info-badge {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* РЎРїРµС†РёР°Р»СЊРЅС‹Рµ СЃС‚РёР»Рё РґР»СЏ РІРµСЂС‚РёРєР°Р»СЊРЅРѕР№ РѕСЂРёРµРЅС‚Р°С†РёРё РЅР° С‚РµР»РµС„РѕРЅР°С… */
+@media (max-height: 700px) and (orientation: portrait) {
+    .tickets-grid {
+        gap: 0.4rem;
+        max-width: 400px;
+    }
+    
+    .ticket-number {
+        font-size: 0.9rem;
+    }
+    
+    .current-page-indicator {
+        font-size: 0.8rem;
+        min-width: 160px;
+        padding: 0.5rem 0.8rem;
+    }
+}
+
+/* РЎС‚РёР»Рё РґР»СЏ Р»Р°РЅРґС€Р°С„С‚РЅРѕР№ РѕСЂРёРµРЅС‚Р°С†РёРё */
+@media (orientation: landscape) and (max-height: 500px) {
+    .tickets-section {
+        margin-top: 1rem;
+    }
+    
+    .tickets-navigation {
+        margin: 1rem 0;
+    }
+    
+    .tickets-grid {
+        max-width: 400px;
+        gap: 0.4rem;
+    }
+    
+    .ticket-number {
+        font-size: 0.9rem;
     }
 }
