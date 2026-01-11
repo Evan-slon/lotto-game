@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Jetton - Лотерея на TON</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Шапка с навигацией назад -->
+        <header class="app-header">
+            <div class="header-content">
+                <button id="backButton" class="back-btn hidden">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Назад</span>
+                </button>
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-dice"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Lucky <span class="jetton-text">Jetton</span></h1>
+                        <p class="tagline">Лотерея на блокчейне TON</p>
+                    </div>
+                </div>
+                <div class="wallet-connect">
+                    <button id="connectWalletBtn" class="wallet-btn">
+                        <i class="fas fa-wallet"></i>
+                        <span>Подключить кошелек</span>
+                    </button>
+                    <div id="walletInfo" class="wallet-info hidden">
+                        <span class="wallet-address">TON: EQD...xyz</span>
+                        <span class="wallet-balance">100.5 TON</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основное содержимое -->
+        <main class="main-content" id="mainContent">
+            <div id="pageContent">
+                <!-- Контент страниц будет загружаться здесь -->
+            </div>
+        </main>
+
+        <!-- Нижняя навигация (скрывается при выборе пула) -->
+        <nav class="bottom-nav" id="bottomNav">
+            <button class="nav-btn active" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn" data-page="pools">
+                <i class="fas fa-ticket-alt"></i>
+                <span>Пулы</span>
+            </button>
+            <button class="nav-btn" data-page="my-tickets">
+                <i class="fas fa-list"></i>
+                <span>Мои билеты</span>
+            </button>
+            <button class="nav-btn" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>Кабинет</span>
+            </button>
+            <button class="nav-btn" data-page="rules">
+                <i class="fas fa-book"></i>
+                <span>Правила</span>
+            </button>
+        </nav>
+
+        <!-- Модальные окна -->
+        <div id="modalContainer"></div>
+
+        <!-- Уведомления -->
+        <div id="notificationContainer"></div>
+    </div>
+
+    <!-- Подключение скриптов -->
+    <script src="data.js"></script>
+    <script src="utils.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
