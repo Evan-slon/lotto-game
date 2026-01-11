@@ -10,8 +10,8 @@ const GAME_CONFIG = {
             name: "Стандартный",
             ticketPrice: 1,
             totalTickets: 1000,
-            availableTickets: 850,
-            soldTickets: 150,
+            availableTickets: 1000,
+            soldTickets: 0,
             prizeFund: 700,
             prizeDistribution: {
                 1: 0.35,
@@ -47,8 +47,8 @@ const GAME_CONFIG = {
             name: "Премиум",
             ticketPrice: 5,
             totalTickets: 750,
-            availableTickets: 600,
-            soldTickets: 150,
+            availableTickets: 750,
+            soldTickets: 0,
             prizeFund: 2625,
             prizeDistribution: {
                 1: 0.35,
@@ -84,8 +84,8 @@ const GAME_CONFIG = {
             name: "Элитный",
             ticketPrice: 10,
             totalTickets: 500,
-            availableTickets: 450,
-            soldTickets: 50,
+            availableTickets: 500,
+            soldTickets: 0,
             prizeFund: 3500,
             prizeDistribution: {
                 1: 0.35,
@@ -140,6 +140,7 @@ const APP_STATE = {
     currentPage: 'home',
     selectedTickets: [],
     purchasedTickets: [],
+    poolsState: {}, // Состояние пулов будет сохраняться здесь
     notifications: []
 };
 
@@ -148,8 +149,14 @@ function loadState() {
     const savedState = localStorage.getItem('luckyJettonState');
     if (savedState) {
         const parsedState = JSON.parse(savedState);
-        Object.assign(APP_STATE, parsedState);
         
+        // Восстанавливаем основное состояние
+        APP_STATE.user = parsedState.user || APP_STATE.user;
+        APP_STATE.selectedTickets = parsedState.selectedTickets || [];
+        APP_STATE.purchasedTickets = parsedState.purchasedTickets || [];
+        APP_STATE.poolsState = parsedState.poolsState || {};
+        
+        // Восстанавливаем даты покупки
         if (APP_STATE.purchasedTickets) {
             APP_STATE.purchasedTickets.forEach(ticket => {
                 if (ticket.purchaseDate) {
@@ -157,18 +164,84 @@ function loadState() {
                 }
             });
         }
+        
+        // Обновляем состояние пулов на основе сохраненных данных
+        updatePoolsFromState();
     }
 }
 
 function saveState() {
     const stateToSave = {
-        ...APP_STATE,
+        user: APP_STATE.user,
+        selectedTickets: APP_STATE.selectedTickets,
         purchasedTickets: APP_STATE.purchasedTickets.map(ticket => ({
             ...ticket,
             purchaseDate: ticket.purchaseDate ? ticket.purchaseDate.toISOString() : new Date().toISOString()
-        }))
+        })),
+        poolsState: APP_STATE.poolsState
     };
+    
     localStorage.setItem('luckyJettonState', JSON.stringify(stateToSave));
+}
+
+// Обновляем состояние пулов на основе сохраненных данных
+function updatePoolsFromState() {
+    // Сначала сбрасываем все пулы к начальному состоянию
+    GAME_CONFIG.pools.forEach(pool => {
+        pool.soldTickets = 0;
+        pool.availableTickets = pool.totalTickets;
+    });
+    
+    // Если есть сохраненное состояние пулов, используем его
+    if (APP_STATE.poolsState && Object.keys(APP_STATE.poolsState).length > 0) {
+        GAME_CONFIG.pools.forEach(pool => {
+            const poolState = APP_STATE.poolsState[pool.id];
+            if (poolState) {
+                pool.soldTickets = poolState.soldTickets || 0;
+                pool.availableTickets = poolState.availableTickets || pool.totalTickets;
+            }
+        });
+    } else {
+        // Иначе вычисляем из purchasedTickets
+        recalculatePoolsFromTickets();
+    }
+}
+
+// Пересчитываем состояние пулов из купленных билетов
+function recalculatePoolsFromTickets() {
+    // Сбрасываем счетчики
+    GAME_CONFIG.pools.forEach(pool => {
+        pool.soldTickets = 0;
+        pool.availableTickets = pool.totalTickets;
+    });
+    
+    // Считаем купленные билеты по пулам
+    if (APP_STATE.purchasedTickets && APP_STATE.purchasedTickets.length > 0) {
+        APP_STATE.purchasedTickets.forEach(ticket => {
+            const pool = GAME_CONFIG.pools.find(p => p.id === ticket.poolId);
+            if (pool) {
+                pool.soldTickets++;
+                pool.availableTickets--;
+            }
+        });
+    }
+    
+    // Сохраняем состояние пулов
+    savePoolsState();
+}
+
+// Сохраняем состояние пулов
+function savePoolsState() {
+    APP_STATE.poolsState = {};
+    
+    GAME_CONFIG.pools.forEach(pool => {
+        APP_STATE.poolsState[pool.id] = {
+            soldTickets: pool.soldTickets,
+            availableTickets: pool.availableTickets
+        };
+    });
+    
+    saveState();
 }
 
 // ===== ФУНКЦИИ ДЛЯ РАБОТЫ С ПОЛЬЗОВАТЕЛЕМ =====
@@ -284,9 +357,14 @@ function purchaseTickets(poolId, ticketNumbers) {
     APP_STATE.user.balance -= totalCost;
     APP_STATE.user.jettonBalance += ticketNumbers.length * GAME_CONFIG.jettonReward;
     
+    // Обновляем состояние пула
     pool.soldTickets += ticketNumbers.length;
     pool.availableTickets -= ticketNumbers.length;
     
+    // Сохраняем состояние пула
+    savePoolsState();
+    
+    // Удаляем купленные билеты из выбранных
     APP_STATE.selectedTickets = APP_STATE.selectedTickets.filter(t => 
         !(t.poolId === poolId && ticketNumbers.includes(t.number))
     );
